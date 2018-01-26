@@ -15,6 +15,7 @@ flatsh = pi3d.Shader("uv_flat")
 # load textures
 metlimg = pi3d.Texture("metalhull.jpg")
 plntimg = pi3d.Texture("planet10.jpg")
+plnnorm = pi3d.Texture("planet10.jpg", normal_map=-2.0)
 mudnorm = pi3d.Texture("mudnormal.jpg")
 flrnorm = pi3d.Texture("floor_nm.jpg")
 grsnorm = pi3d.Texture("grasstile_n.jpg")
@@ -44,7 +45,7 @@ RADIUS = 1.0                         # radius of ball
 ball = pi3d.Triangle(corners=((-0.01, 0.0), (0.0, 0.01), (0.01, 0.0))) # an 'empty' game object
 ball_shape = pi3d.Sphere(radius=RADIUS, slices=24, sides=24) # the visible shape
 ball.add_child(ball_shape)           # to get realistic 'rolling'
-ball_shape.set_draw_details(shader, [plntimg, flrnorm], 4.0)
+ball_shape.set_draw_details(shader, [plntimg, plnnorm], 1.0)
 
 # platforms
 W = 8.0
@@ -104,7 +105,10 @@ while DISPLAY.loop_running():
 
   # check position
   if abs(xp - xb) < RADIUS and abs(zp - zb) < RADIUS:
-    pole.set_material((1.0, 0.0, 0.0))
+    pole.set_material((1.0, 0.0, 0.0))     # set pole to red
+    xb += dr * math.sin(math.radians(ballrot))
+    zb -= dr * math.cos(math.radians(ballrot))
+    dr *= -0.1                             # undo forward movement and stop
 
   on_plat = False
   for p in platforms:
@@ -118,18 +122,18 @@ while DISPLAY.loop_running():
       break # shouldn't be on more than one platform at once!
 
   ht = mymap.calcHeight(xb, zb)
-  if yb < (ht + RADIUS):                   # this is on the ground - explode!
-    yb = ht + RADIUS
-    dy = 0
-    ball.scale(expl, expl, expl)
+  if yb < (ht + RADIUS) or expl > 1.0:     # ball is on the ground - explode!
+    yb = ht + RADIUS * expl                # put it back on the surface
+    dy = 0                                 # set vertical velocity to 0
+    ball.scale(expl, expl, expl)           # scale up
     expl *= 1.25                           # increase size 25% each frame
-    ball_shape.set_material((0.2 * expl, 0.0, 0.0))
-    if expl > 10.0:
-      dr = 0.0                             # rolling speed
-      dy = 0.0                             # vertical speed (for jumping)
-      expl = 1.0                           # scale value for exploding
-      ball_shape.set_material((0.5, 0.5, 0.5))
-      ball.scale(expl, expl, expl)
+    ball_shape.set_material((0.2 * expl, 0.0, 0.0)) # change colour redder and redder
+    if expl > 10.0:                        # enough exploding - back to start
+      dr = 0.0                             # rolling speed to zero
+      dy = 0.0                             # vertical speed zero
+      expl = 1.0                           # scale zero
+      ball_shape.set_material((0.5, 0.5, 0.5)) # natual colour
+      ball.scale(expl, expl, expl)         # reset scale
       xb, yb, zb = platforms[0].x(), platforms[0].y() + RADIUS + 5.0, platforms[0].z()
                                            # ball location coordinates
       xc, yc, zc = xb, yb, zb              # set camera coords equal to ball coords
