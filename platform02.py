@@ -79,9 +79,10 @@ xb, yb, zb = platforms[0].x(), platforms[0].y() + RADIUS + 5.0, platforms[0].z()
 xc, yc, zc = xb, yb, zb              # set camera coords equal to ball coords
 
 # end pole
+PRADIUS = 2.0
 xp, zp = 0.0, 0.0
-yp = mymap.calcHeight(xp, zp) + 20
-pole = pi3d.Helix(radius=4, ringrots=8, thickness=0.8, rise=16, loops=8, x=xp, y=yp, z=zp)
+yp = mymap.calcHeight(xp, zp) + 24
+pole = pi3d.Helix(radius=PRADIUS, ringrots=8, thickness=0.8, rise=16, loops=8, x=xp, y=yp, z=zp)
 pole.set_draw_details(shader, [metlimg, flrnorm], 12.0)
 
 # keyboard object for getting key presses
@@ -111,7 +112,7 @@ while DISPLAY.loop_running():
   yb += dy # position changes by velocity
 
   # check position
-  if abs(xp - xb) < RADIUS and abs(zp - zb) < RADIUS:
+  if abs(xp - xb) < (RADIUS + PRADIUS) and abs(zp - zb) < (RADIUS + PRADIUS):
     pole.set_material((1.0, 0.0, 0.0))     # set pole to red
     xb += dr * math.sin(math.radians(ballrot))
     zb -= dr * math.cos(math.radians(ballrot))
