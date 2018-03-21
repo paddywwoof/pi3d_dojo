@@ -7,7 +7,7 @@ import random
 
 RANGE = 100.0
 HIT_DIST = 5.0
-MODEL_PATH = '/home/patrick/raspberry_pi/EscapeRoom/src/chapters/wall/assets/hyperspace/{}'
+MODEL_PATH = '{}'
 
 def shallow_clone(shape):
   state = shape.__getstate__()

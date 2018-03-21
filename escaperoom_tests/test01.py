@@ -5,7 +5,7 @@ import random
 
 RANGE = 100.0
 HIT_DIST = 5.0
-MODEL_PATH = '/home/patrick/raspberry_pi/EscapeRoom/src/chapters/wall/assets/hyperspace/{}'
+MODEL_PATH = '{}'
 display = pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
 camera = pi3d.Camera()
 shader = pi3d.Shader('uv_light')

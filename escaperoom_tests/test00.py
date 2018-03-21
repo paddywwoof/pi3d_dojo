@@ -2,7 +2,7 @@ import pi3d
 import numpy as np
 
 RANGE = 100.0
-MODEL_PATH = '/home/patrick/raspberry_pi/EscapeRoom/src/chapters/wall/assets/hyperspace/{}'
+MODEL_PATH = '{}'
 display = pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
 shader = pi3d.Shader('uv_light')
 laser_shader = pi3d.Shader('mat_flat')
