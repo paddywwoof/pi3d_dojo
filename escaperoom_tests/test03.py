@@ -17,7 +17,7 @@ def shallow_clone(shape):
 
 display = pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
 camera = pi3d.Camera()
-shader = pi3d.Shader('uv_bump')
+shader = pi3d.Shader('uv_light')
 laser_shader = pi3d.Shader('mat_flat')
 
 # scene - empty to hold objects
@@ -43,11 +43,9 @@ asteroid.set_shader(shader)
 
 # rings
 ring = pi3d.Model(file_string=MODEL_PATH.format('straight_ring_2.obj'))
-ring_norm = pi3d.Texture('straight_ring_2_norm.png')
 empty = pi3d.Triangle(corners=((0,0),(1,1),(-1,1)), z=50.0)
 ring.set_shader(shader)
-ring.set_normal_shine(ring_norm)
-ring.set_fog((0.0, 0.0, 0.0, 0.0), 350.6)
+ring.set_fog((0.0, 0.0, 0.0, 0.0), 300.6)
 empty.add_child(ring)
 ring_list = [empty]
 for i in range(5):
