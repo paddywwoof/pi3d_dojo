@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1,'/home/patrick/raspberry_pi/pi3d') # to use local 'develop' branch version
 import pi3d
 import numpy as np
 
@@ -70,10 +72,7 @@ while display.loop_running():
     elif k == ord(' '): # shoot with space
       blast_dist = 0.5 # positive value 'sets it off'
       ''' hit test check direction of pulse '''
-      # translation needs 4x4 matrix and x,y,z,w with w set to 1.0
-      tip_pt = np.dot(laser_tip.MRaw.T, [0.0, 1.0, 0.0, 1.0])[:3] # cylinder originally vertical now rotated in line with barrel
-      but_pt = np.dot(laser_tip.MRaw.T, [0.0, 0.0, 0.0, 1.0])[:3] # needs to be transposed for use outside OpenGL
-      aim_vec = tip_pt - but_pt # because translated need to do this
+      but_pt, aim_vec = laser_gun.transform_direction([0.0, 0.0, 1.0])
       dir_vec = asteroid.unif[0:3] - but_pt # vector to asteroid
       # dir_vec = asteroid.xyz - but_pt # can do this after pi3d v2.21
       len_dir = np.dot(dir_vec, dir_vec) ** 0.5 # std length calc
@@ -82,14 +81,6 @@ while display.loop_running():
         c_prod = np.cross(dir_vec, aim_vec) # cross product of two vectors
         sin_ang = np.dot(c_prod, c_prod) ** 0.5 # magnitude of cross product is sin angle between as both unit vecs
         print(sin_ang, c_prod)
-      ''' alternatively the laser pulse wouldn't be a child object but would be 'top level'
-      the absolute direction vector of the gun would be got in the same way as above and 
-      this would be used to increment the position of the pulse. The location of the
-      pulse would then have to be checked each frame against the position of possible
-      targets. In many ways this would be better but it would either need a spherical
-      pulse or the rotation matrix would have to be extracted from the gun's combined
-      transformation matrix.
-      '''
     elif k==27:
       keys.close()
       display.destroy()

@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1,'/home/patrick/raspberry_pi/pi3d') # to use local 'develop' branch version
 import pi3d
 import numpy as np
 import math
@@ -80,7 +82,7 @@ while display.loop_running():
   laser_gun.rotateToX(max(min(20, -my), -85))
   if blast_dist > 0.0:
     laser_tip.draw()
-    laser_tip.position(*(tip_pt + aim_vec * blast_dist))
+    laser_tip.position(*(but_pt + aim_vec * (1.0 + blast_dist)))
     blast_dist += 5.0
     if blast_dist > RANGE:
       blast_dist = 0.0
@@ -108,16 +110,9 @@ while display.loop_running():
       pod.rotateIncX(8)
     elif k == ord(' '): # shoot with space
       blast_dist = 0.5 # positive value 'sets it off'
-      # translation needs 4x4 matrix and x,y,z,w with w set to 1.0
-      tip_pt = np.dot(laser_gun.MRaw.T, [0.0, 0.3, 1.0, 1.0])[:3] # gun 'pointing' in +ve z direction
-      but_pt = np.dot(laser_gun.MRaw.T, [0.0, 0.3, 0.0, 1.0])[:3] # needs to be transposed for use outside OpenGL
-      aim_vec = tip_pt - but_pt # because translated need to do this
-      # there are some utility functions in the Camera class
-      rot_matrix = camera.matrix_from_two_vecors(np.array([0.0, 0.0, 1.0]), aim_vec)
-      rot_euler = camera.euler_angles(rot_matrix)
-      laser_tip.rotateToX(-rot_euler[0]) # unclear why x and y need to be -ve
-      laser_tip.rotateToY(-rot_euler[1])
-      laser_tip.rotateToZ(rot_euler[2])
+      but_pt, aim_vec = laser_gun.transform_direction([0.0, 0.3, 1.0],
+                                                      [0.0, 0.3, 0.0])
+      laser_tip.rotate_to_direction(aim_vec)
     elif k==27:
       keys.close()
       display.destroy()

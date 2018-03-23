@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(1,'/home/patrick/raspberry_pi/pi3d')
+sys.path.insert(1,'/home/patrick/raspberry_pi/pi3d') # to use local 'develop' branch version
 import pi3d
 import numpy as np
 import math
@@ -17,7 +17,7 @@ def shallow_clone(shape):
 
 display = pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
 camera = pi3d.Camera()
-shader = pi3d.Shader('uv_light')
+shader = pi3d.Shader('uv_bump')
 laser_shader = pi3d.Shader('mat_flat')
 
 # scene - empty to hold objects
@@ -43,16 +43,18 @@ asteroid.set_shader(shader)
 
 # rings
 ring = pi3d.Model(file_string=MODEL_PATH.format('straight_ring_2.obj'))
+ring_norm = pi3d.Texture('straight_ring_2_norm.png')
 empty = pi3d.Triangle(corners=((0,0),(1,1),(-1,1)), z=50.0)
 ring.set_shader(shader)
+ring.set_normal_shine(ring_norm)
 ring.set_fog((0.0, 0.0, 0.0, 0.0), 350.6)
 empty.add_child(ring)
 ring_list = [empty]
 for i in range(5):
-  next_empty = shallow_clone(empty)
+  next_empty = empty.shallow_clone() #(empty)
   next_empty.rotateIncX(random.random() * 40.0 - 20.0)
   next_empty.rotateIncY(random.random() * 40.0 - 20.0)
-  next_ring = shallow_clone(ring)
+  next_ring = ring.shallow_clone() #(ring)
   next_empty.children = [next_ring]
   ring_list[-1].add_child(next_empty)
   ring_list.append(next_empty)
@@ -98,7 +100,7 @@ while display.loop_running():
   laser_gun.rotateToX(max(min(20, -my), -85))
   if blast_dist > 0.0:
     laser_tip.set_alpha(0.8)
-    laser_tip.position(*(tip_pt + aim_vec * blast_dist))
+    laser_tip.position(*(but_pt + aim_vec * (1.0 + blast_dist)))
     blast_dist += 5.0
     if blast_dist > RANGE:
       blast_dist = 0.0
@@ -127,16 +129,9 @@ while display.loop_running():
       pod.rotateIncX(8)
     elif k == ord(' '): # shoot with space
       blast_dist = 0.5 # positive value 'sets it off'
-      # translation needs 4x4 matrix and x,y,z,w with w set to 1.0
-      tip_pt = np.dot(laser_gun.MRaw.T, [0.0, 0.3, 1.0, 1.0])[:3] # gun 'pointing' in +ve z direction
-      but_pt = np.dot(laser_gun.MRaw.T, [0.0, 0.3, 0.0, 1.0])[:3] # needs to be transposed for use outside OpenGL
-      aim_vec = tip_pt - but_pt # because translated need to do this
-      # there are some utility functions in the Camera class
-      rot_matrix = camera.matrix_from_two_vecors(np.array([0.0, 0.0, 1.0]), aim_vec)
-      rot_euler = camera.euler_angles(rot_matrix)
-      laser_tip.rotateToX(-rot_euler[0]) # unclear why x and y need to be -ve
-      laser_tip.rotateToY(-rot_euler[1])
-      laser_tip.rotateToZ(rot_euler[2])
+      but_pt, aim_vec = laser_gun.transform_direction([0.0, 0.3, 1.0],
+                                                      [0.0, 0.3, 0.0])
+      laser_tip.rotate_to_direction(aim_vec)
     elif k==27:
       keys.close()
       display.destroy()
