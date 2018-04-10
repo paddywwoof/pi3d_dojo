@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(1,'/home/patrick/raspberry_pi/pi3d') # to use local 'develop' branch version
+sys.path.insert(1,'/home/pi/pi3d') # to use local 'develop' branch version
 import pi3d
 import numpy as np
 import math
