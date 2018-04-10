@@ -9,8 +9,10 @@ RANGE = 100.0
 HIT_DIST = 5.0
 MODEL_PATH = '{}'
 display = pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
-camera = pi3d.Camera()
-shader = pi3d.Shader('uv_light')
+# option 1 move near plane away (default is 1.0)
+#_di = display.INSTANCE
+camera = pi3d.Camera()#lens=(15.0, display.far, display.fov, display.width/float(display.height)))
+shader = pi3d.Shader('uv_light_nearfade')
 laser_shader = pi3d.Shader('mat_flat')
 
 # pod, base and gun
@@ -51,6 +53,8 @@ while display.loop_running():
     camera.reset()
     camera.position((camera.eye[0] * 0.98 + pod.x() * 0.02, 
                      camera.eye[1] * 0.98 + pod.y() * 0.02, 0.0))
+  pod.draw()
+  asteroid.draw()
   for i in range(6):
     if i >= len(ring_list):
       ring_list.append(ring_list[-1][:])
@@ -77,8 +81,6 @@ while display.loop_running():
       print(ring_list[0][3:5])
       ring_list = ring_list[1:]
 
-  pod.draw()
-  asteroid.draw()
   #asteroid.rotateIncX(1.5)
   asteroid.rotateIncZ(2.0)
   mx, my = mouse.position()

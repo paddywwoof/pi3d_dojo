@@ -69,6 +69,10 @@ mouse.start()
 blast_dist = 0.0
 
 while display.loop_running():
+  if np.sum(np.abs(camera.eye[0:2] - pod.unif[0:2])) > 0.05:
+    camera.reset()
+    camera.position((camera.eye[0] * 0.98 + pod.x() * 0.02, 
+                     camera.eye[1] * 0.98 + pod.y() * 0.02, 0.0))
   scene.draw()
 
   ring_list[0].translateZ(-0.1)
@@ -134,7 +138,3 @@ while display.loop_running():
       keys.close()
       display.destroy()
       break
-  if np.sum(np.abs(camera.eye[0:2] - pod.unif[0:2])) > 0.05:
-    camera.reset()
-    camera.position((camera.eye[0] * 0.98 + pod.x() * 0.02, 
-                     camera.eye[1] * 0.98 + pod.y() * 0.02, 0.0))
